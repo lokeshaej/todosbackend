@@ -3,7 +3,9 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const admin = require('firebase-admin');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const fetch = require('node-fetch'); // Ensure node-fetch is installed: npm install node-fetch
+// IMPORTANT CHANGE: Use dynamic import for node-fetch
+// This is because node-fetch is now an ES Module (ESM) and cannot be directly 'required' in CommonJS.
+let fetch; // Declare fetch variable
 
 // NEW Firebase Admin SDK initialization for Vercel
 // This block expects the FIREBASE_SERVICE_ACCOUNT_KEY environment variable
@@ -36,7 +38,7 @@ const PORT = process.env.PORT || 3000; // Vercel will typically use its own port
 const allowedOrigins = [
   'http://localhost:3000', // For local development
   'https://frontefront-7m2yrofu6-lokeshas-projects.vercel.app', // Your deployed frontend Vercel URL
-  'https://frontefront.vercel.app', // NEW: Added your primary frontend Vercel URL
+  'https://frontefront.vercel.app', // Added your primary frontend Vercel URL
   // Add any other specific frontend URLs if needed (e.g., development branches)
 ];
 
@@ -69,6 +71,20 @@ app.use((req, res, next) => {
   req.userId = req.headers['x-user-id'] || 'anonymous'; // Get userId from header
   next();
 });
+
+// Dynamic import for node-fetch, executed once when the server starts
+// This ensures 'fetch' is available before any routes try to use it.
+(async () => {
+  try {
+    const nodeFetchModule = await import('node-fetch');
+    fetch = nodeFetchModule.default; // Assign the default export to the fetch variable
+    console.log("node-fetch imported successfully.");
+  } catch (error) {
+    console.error("Failed to import node-fetch:", error);
+    process.exit(1); // Exit if critical dependency fails to load
+  }
+})();
+
 
 // --- API Endpoints ---
 
@@ -178,6 +194,7 @@ app.post('/send-single-todo-to-slack', async (req, res) => {
     }
 
     // Use node-fetch to send the Slack message
+    // Ensure 'fetch' is defined from the dynamic import before this point.
     const slackResponse = await fetch(SLACK_WEBHOOK_URL, {
       method: 'POST',
       headers: {
@@ -201,6 +218,8 @@ app.post('/send-single-todo-to-slack', async (req, res) => {
 
 
 // Start the server
+// Note: In Vercel serverless functions, the 'app.listen' might not be strictly necessary
+// as Vercel handles the server lifecycle, but it's harmless for local development.
 app.listen(PORT, () => {
   console.log(`Backend server running on port ${PORT}`);
 });
