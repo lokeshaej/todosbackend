@@ -48,7 +48,7 @@ app.use(bodyParser.json()); // Parse JSON request bodies
 // IMPORTANT: Replace with your actual Gemini API Key and Slack Webhook URL.
 // For production, use a .env file or proper environment variable management.
 const GEMINI_API_KEY ="AIzaSyDM09oq_7jzDqywdMJg4pTRwKVv62vg9P4"; // Your Gemini API Key
-const SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'; // Your Slack Incoming Webhook URL
+const SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'; // Your Slack Incoming Webhook URL
 
 
 // Middleware to log user ID (optional, for debugging/tracking)
