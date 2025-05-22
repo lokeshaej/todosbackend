@@ -31,7 +31,7 @@ try {
 
 const db = admin.firestore();
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || "https://todosbackend.vercel.app";
 
 app.use(cors()); // Enable CORS for all origins
 app.use(bodyParser.json()); // Parse JSON request bodies
