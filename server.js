@@ -36,6 +36,7 @@ const PORT = process.env.PORT || 3000; // Vercel will typically use its own port
 const allowedOrigins = [
   'http://localhost:3000', // For local development
   'https://frontefront-7m2yrofu6-lokeshas-projects.vercel.app', // Your deployed frontend Vercel URL
+  'https://frontefront.vercel.app', // NEW: Added your primary frontend Vercel URL
   // Add any other specific frontend URLs if needed (e.g., development branches)
 ];
 
