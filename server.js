@@ -20,8 +20,8 @@ try {
   // admin.initializeApp({
   //   credential: admin.credential.cert(serviceAccount)
   // });
-  console.error("Error initializing Firebase Admin SDK:", error.message);
-  console.warn("Attempting to initialize with serviceAccountKey.json directly. Ensure it's present and correctly configured.");
+  console.log("Error initializing Firebase Admin SDK:", error.message);
+  console.log("Attempting to initialize with serviceAccountKey.json directly. Ensure it's present and correctly configured.");
   // Fallback if applicationDefault fails, assuming serviceAccountKey.json is in the same directory
   try {
     const serviceAccount = require('./firebaseAdminConfig.json');
