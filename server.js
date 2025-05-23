@@ -10,21 +10,23 @@ let fetch; // Declare fetch variable
 // NEW Firebase Admin SDK initialization for Vercel
 // This block expects the FIREBASE_SERVICE_ACCOUNT_KEY environment variable
 // to be set in Vercel with the Base64 encoded content of your Firebase service account JSON file.
+console.log(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
   try {
     // Decode the base64 encoded service account key JSON string
     const serviceAccount = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_KEY, 'base64').toString('utf8'));
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
+
     });
     console.log("Firebase Admin SDK initialized successfully using Vercel environment variable.");
   } catch (error) {
-    console.error("Error initializing Firebase Admin SDK from environment variable:", error.message);
+    console.log("Error initializing Firebase Admin SDK from environment variable:", error.message);
     process.exit(1); // Exit if Firebase Admin SDK cannot be initialized
   }
 } else {
-  console.error("FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set. Firebase Admin SDK not initialized.");
-  console.error("Please set this environment variable in your Vercel project settings.");
+  console.log("FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set. Firebase Admin SDK not initialized.");
+  console.log("Please set this environment variable in your Vercel project settings.");
   process.exit(1); // Exit if Firebase Admin SDK cannot be initialized
 }
 
@@ -58,6 +60,9 @@ app.use(bodyParser.json()); // Parse JSON request bodies
 
 // Environment variables for API keys and Slack Webhook
 // IMPORTANT: These values MUST be set in Vercel's project environment variables.
+console.log(process.env.GEMINI_API_KEY);
+console.log(process.env.SLACK_WEBHOOK_URL);
+
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
 
@@ -80,7 +85,7 @@ app.use((req, res, next) => {
     fetch = nodeFetchModule.default; // Assign the default export to the fetch variable
     console.log("node-fetch imported successfully.");
   } catch (error) {
-    console.error("Failed to import node-fetch:", error);
+    console.log("Failed to import node-fetch:", error);
     process.exit(1); // Exit if critical dependency fails to load
   }
 })();
@@ -113,7 +118,7 @@ app.post('/summarize-single-todo', async (req, res) => {
     res.status(200).json({ message: 'Single todo summary generated successfully.', summary: summary });
 
   } catch (llmError) {
-    console.error("Error calling Gemini LLM for single todo:", llmError);
+    console.log("Error calling Gemini LLM for single todo:", llmError);
     // More robust error message extraction for LLM errors
     const errorMessage = llmError.response?.data?.error?.message || llmError.message;
     res.status(500).json({ error: `Error generating summary for single todo: ${errorMessage}` });
@@ -145,7 +150,7 @@ app.post('/send-single-todo-to-slack', async (req, res) => {
       finalSummary = response.text();
       console.log(`Generated summary for single todo: ${finalSummary}`);
     } catch (llmError) {
-      console.error('Error generating summary for single todo:', llmError);
+      console.log('Error generating summary for single todo:', llmError);
       // Proceed without summary if LLM fails, or send a specific error message
       finalSummary = `Could not generate summary for: "${text}".`;
     }
@@ -207,11 +212,11 @@ app.post('/send-single-todo-to-slack', async (req, res) => {
       res.status(200).json({ message: 'Todo summary sent to Slack successfully!' });
     } else {
       const errorData = await slackResponse.text(); // Read error response from Slack
-      console.error('Slack API error:', slackResponse.status, errorData);
+      console.log('Slack API error:', slackResponse.status, errorData);
       res.status(slackResponse.status).json({ error: `Failed to send message to Slack: ${errorData}` });
     }
   } catch (error) {
-    console.error('Error sending message to Slack:', error);
+    console.log('Error sending message to Slack:', error);
     res.status(500).json({ error: 'Internal server error: Could not send message to Slack.' });
   }
 });
